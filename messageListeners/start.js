@@ -23,10 +23,14 @@ module.exports = {
         await confirm.react("❌");
 
         await confirm.awaitReactions(
-            reaction => reaction.emoji.name === "✅" || reaction.emoji.name === "❌",
+            (reaction, user) => (
+                reaction.emoji.name === "✅" || 
+                reaction.emoji.name === "❌"
+                ) && user.id === id,
             { max: 1 }
         ).then(collected => {
             const reaction = collected.first();
+            if (reaction)
             if (reaction.emoji.name === "✅") {
                 UserManager.setUser(id, { username: this.users[id].username, group: "" });
                 message.channel.send("**Profile Successfully created! Have fun!**");

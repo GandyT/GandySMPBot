@@ -2,8 +2,8 @@
 const Discord = require("discord.js");
 
 module.exports = {
-    names: ["template"],
-    desc: "this is a template command",
+    names: ["createfaction", "cf"],
+    desc: "This command is to create a faction",
     async execute(env) {
         /** 
          * @param  {Discord.Message} message
