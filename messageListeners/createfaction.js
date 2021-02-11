@@ -1,23 +1,29 @@
 /* EXETERNAL MODULES */
 const Discord = require("discord.js");
-const UserManager = require("../resource/modules/dataManager.js");
+const DataManager = require("../resource/modules/dataManager.js");
 
 module.exports = {
-    name: "start",
+    name: "createfaction",
     users: {},
     async invoke(message) {
         const id = message.author.id;
         if (!this.users[id]) return false;
         if (this.users[id].channelId !== message.channel.id) return false;
-        if (this.users[id].username !== undefined) {
+        if (this.users[id].name) {
             delete this.users[id];
             message.channel.send("**Setup Cancelled**");
             return;
         }
 
-        this.users[id].username = message.content;
+        if (DataManager.getGroup(message.content.toLowerCase())) {
+            message.channel.send("**Name already taken. Enter another name**");
+            return;
+        }
+
+        this.users[id].name = message.content;
+
         var confirm = await message.channel.send(
-            `**Are you sure your username is ${this.users[id].username}?**`
+            `**Are you sure you want to create ${this.users[id].name}?**`
         );
         await confirm.react("✅");
         await confirm.react("❌");
@@ -32,8 +38,11 @@ module.exports = {
             const reaction = collected.first();
             if (!reaction) return;
             if (reaction.emoji.name === "✅") {
-                UserManager.setUser(id, { username: this.users[id].username, group: "" });
-                message.channel.send("**Profile Successfully created! Have fun!**");
+                var user = DataManager.getUser(id);
+                user.group = this.users[id].name.toLowerCase();
+                DataManager.setUser(id, user);
+                DataManager.setGroup(this.users[id].name, { leader: id, members: [id], allies: [], war: ""});
+                message.channel.send("**Faction Successfully created! Good Luck!**");
             } else {
                 message.channel.send("**Setup Cancelled**");
             }
@@ -49,7 +58,7 @@ module.exports = {
                 data: data,
                 started: new Date().getTime(),
                 channelId: channelId,
-                username: undefined
+                name: ""
             }
     }
 }
