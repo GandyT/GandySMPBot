@@ -1,5 +1,3 @@
-const StartingScripts = require("../resource/modules/startingScripts.js");
-
 module.exports = {
     event: "ready",
     async execute() {

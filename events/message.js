@@ -3,9 +3,9 @@ module.exports = {
     async execute(message) {
         const client = this;
 
-        if (!message.member.roles.cache.find(r => r.id === process.env.SMP_ROLE)) return;
         if (message.author.bot) return;
         if (message.channel.type === "dm") return;
+        if (!message.member.roles.cache.find(r => r.id === process.env.SMP_ROLE)) return;
 
         if (client.messageListener.invoke(message) === true) return;
         

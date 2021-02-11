@@ -44,15 +44,6 @@ Fs.readdir("messageListeners", (err, files) => {
 
     client.messageListener = new MessageListener(messageListeners);
 });
-Fs.readdir("constantListeners", (err, files) => {
-    if (err) throw new Error(err);
-
-    var constantListeners = [];
-    files.forEach(file => {
-        constantListeners.push(require(`./constantListeners/${file}`));
-    });
-    client.constantListeners = constantListeners;
-})
 
 /* INITIALIZATION */
 console.log(`Loading ${process.env.NAME} v${process.env.VERSION}...`);
