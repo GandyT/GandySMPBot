@@ -1,10 +1,9 @@
 /* EXTERNAL MODULES */
 const Discord = require("discord.js");
-const DataManager = require("../resource/modules/dataManager.js");
 
 module.exports = {
-    names: ["createfaction", "cf"],
-    desc: "This command is to create a faction",
+    names: ["acceptrequest", "ar"],
+    desc: "accept a user to your faction",
     async execute(env) {
         /** 
          * @param  {Discord.Message} message
@@ -16,10 +15,7 @@ module.exports = {
         var user = DataManager.getUser(message.author.id);
         if (!user) 
             return message.channel.send(`You have not joined the SMP. Type ${process.env.PREFIX}start to join!`);
-        if (user.group !== "")
-            return message.channel.send("You are already in a faction.");
-        
-        client.messageListener.listen("createfaction", message);
-        message.channel.send(`<@${message.author.id}>, please enter the name of your faction`);
+        if (user.group === "")
+            return message.channel.send("You are not in a faction.");
     }
 }

@@ -15,6 +15,17 @@ module.exports = {
             return;
         }
 
+        if (message.content.length > 30) {
+            delete this.users[id];
+            message.channel.send("**Invalid Username, Setup Cancelled**");
+            return;
+        }
+        if (message.content.length < 3) {
+            delete this.users[id];
+            message.channel.send("**Invalid Username, Setup Cancelled**");
+            return;
+        }
+
         this.users[id].username = message.content;
         var confirm = await message.channel.send(
             `**Are you sure your username is ${this.users[id].username}?**`

@@ -3,32 +3,26 @@ const Discord = require("discord.js");
 const DataManager = require("../resource/modules/dataManager.js");
 
 module.exports = {
-    name: "createfaction",
+    name: "joinfaction",
     users: {},
     async invoke(message) {
         const id = message.author.id;
         if (!this.users[id]) return false;
         if (this.users[id].channelId !== message.channel.id) return false;
-        if (this.users[id].name) {
+        if (this.users[id].choice) {
             delete this.users[id];
             message.channel.send("**Setup Cancelled**");
             return;
         }
 
-        if (DataManager.getGroup(message.content.toLowerCase())) {
-            message.channel.send("**Name already taken. Enter another name**");
-            return;
-        }
-        if (message.content.length > 40) {
-            message.channel.send("Max Name Length: 40. Try again");
-            return;
-        }
+        var groups = Object.entries(DataManager.getGroups());
+        var choice = parseInt(message.content);
+        if (!groups[choice - 1]) 
+            return message.channel.send(`Invalid group. Choose from numbers 1-${groups.length}`);
+        
+        this.users[id].choice = choice;
 
-        this.users[id].name = message.content;
-
-        var confirm = await message.channel.send(
-            `**Are you sure you want to create ${this.users[id].name}?**`
-        );
+        const confirm = await message.channel.send(`Are you sure you want to join\n**${groups[choice - 1][0]}**?`);
         await confirm.react("✅");
         await confirm.react("❌");
 
@@ -42,11 +36,11 @@ module.exports = {
             const reaction = collected.first();
             if (!reaction) return;
             if (reaction.emoji.name === "✅") {
-                var user = DataManager.getUser(id);
-                user.group = this.users[id].name.toLowerCase();
                 DataManager.setUser(id, user);
-                DataManager.setGroup(this.users[id].name, { leader: id, members: [id], requests: [], allies: [], war: ""});
-                message.channel.send("**Faction Successfully created! Good Luck!**");
+                var group = DataManager.getGroup(user.group);
+                group.requests.push(id);
+                DataManager.setGroup(user.group, group);
+                message.channel.send(`**Requested to join ${groups[choice - 1][0]}! Good Luck!**`);
             } else {
                 message.channel.send("**Setup Cancelled**");
             }
@@ -60,9 +54,9 @@ module.exports = {
             this.users[userId] = {
                 id: userId,
                 data: data,
+                choice: undefined,
                 started: new Date().getTime(),
                 channelId: channelId,
-                name: ""
             }
     }
 }
