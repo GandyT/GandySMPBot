@@ -12,7 +12,7 @@ module.exports = {
         */
         const { message, args, client } = env; // Variables
 
-        var user = DataManager.getUser(message.author.id);
-        if(!user) return message.channel.send("**You do not have a profile. Type .start to setup your profile**");
+
+
     }
 }

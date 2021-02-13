@@ -14,8 +14,8 @@ module.exports = {
         const { message, args, client } = env; // Variables
 
         var user = DataManager.getUser(message.author.id);
-        if(!user) return message.channel.send("**You do not have a profile. Type .start to setup your profile**");
-        if(user.groups === "") return message.channel.send("**You are already in a group, Please leave it first if you wish to join a new one**");
+        if (!user) return message.channel.send("**You do not have a profile. Type .start to setup your profile**");
+        if (user.group !== "") return message.channel.send("**You are already in a group, Please leave it first if you wish to join a new one**");
 
         var groups = DataManager.getGroups();
         var groupStr = "Enter the list number of the group. ex: first group on the list type 1\n\n";
@@ -26,7 +26,7 @@ module.exports = {
         }
 
         message.channel.send(
-            new Discord.MessageEmbed()  
+            new Discord.MessageEmbed()
                 .setTitle("**GROUPS**")
                 .setDescription(groupStr)
         )

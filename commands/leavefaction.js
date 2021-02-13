@@ -14,7 +14,7 @@ module.exports = {
         const { message, args, client } = env; // Variables
         var user = DataManager.getUser(message.author.id);
         if (!user) return message.channel.send("**You do not have a profile. Type .start to setup your profile**");
-        if(user.group === "") return message.channel.send("**You are currently not in a group. To join a group type .joinfaction [groupname]")
+        if(user.group === "") return message.channel.send("**You are currently not in a group. To join a group type .joinfaction [groupname]**")
         var group = DataManager.getGroup(user.group);
         if (group.leader === message.author.id) return message.channel.send("**You are the leader of the group. Type .disbandfaction to disband your group or type .transferfaction to transfer ownership to another member**");
         

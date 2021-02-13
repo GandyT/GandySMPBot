@@ -3,7 +3,7 @@ const Discord = require("discord.js");
 const DataManager = require("../resource/modules/dataManager.js");
 
 module.exports = {
-    name: "joinfaction",
+    name: "acceptrequest",
     users: {},
     async invoke(message) {
         const id = message.author.id;
@@ -11,19 +11,20 @@ module.exports = {
         if (this.users[id].channelId !== message.channel.id) return false;
         if (this.users[id].choice) {
             delete this.users[id];
-            message.channel.send("**Setup Cancelled**");
+            message.channel.send("**Selection Cancelled**");
             return;
         }
 
-        var groups = Object.entries(DataManager.getGroups());
         var choice = parseInt(message.content);
-        if (!groups[choice - 1])
-            return message.channel.send(`Invalid group. Choose from numbers 1-${groups.length}`);
-        if (groups[choice - 1][1].members.length >= parseInt(process.env.MAX_MEMBERS))
-            return message.channel.send(`That group already has ${process.env.MAX_MEMBERS}/${process.env.MAX_MEMBERS} members`);
+        var group = DataManager.getGroup(this.users[id].data.name);
+        var requester = group.requests[choice - 1];
+
+        if (!requester)
+            return message.channel.send("Invalid Selection. Try again");
         this.users[id].choice = choice;
 
-        const confirm = await message.channel.send(`Are you sure you want to join\n**${groups[choice - 1][0]}**?`);
+        const confirm = await message.channel.send(`**Are you sure you want to accept <@${group.requests[choice - 1]}> to ${this.users[id].data.name}?**`)
+
         await confirm.react("✅");
         await confirm.react("❌");
 
@@ -37,10 +38,19 @@ module.exports = {
             const reaction = collected.first();
             if (!reaction) return;
             if (reaction.emoji.name === "✅") {
-                var group = DataManager.getGroup(groups[choice - 1][0]);
-                group.requests.push(id);
-                DataManager.setGroup(groups[choice - 1][0], group);
-                message.channel.send(`**Requested to join ${groups[choice - 1][0]}! Good Luck!**\n<@${groups[choice - 1][1].leader}>`);
+                var user = DataManager.getUser(requester);
+                if (user.group !== "") {
+                    delete this.users[id];
+                    message.channel.send("**That user has already joined a group**");
+                    return;
+                }
+                user.group = this.users[id].data.name;
+                DataManager.setUser(requester, user);
+                group.members.push(requester);
+                group.requests.filter(id => id !== requester);
+                if (group.members.length >= 5) group.requests = [];
+                DataManager.setGroup(user.group, group);
+                message.channel.send(`**<@${requester}> Successfully Accepted!**`);
             } else {
                 message.channel.send("**Setup Cancelled**");
             }
