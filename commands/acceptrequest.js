@@ -21,6 +21,8 @@ module.exports = {
         var group = DataManager.getGroup(user.group);
         if (group.leader !== message.author.id)
             return message.channel.send("You are not the leader of your group.")
+        if (!group.requests.length)
+            return message.channel.send("Your group does not have any pending requests");
 
         var requestStr = "Type the number for the user you want to accept. ex: first user type 1\n\n";
         group.requests.forEach((id, i) => {

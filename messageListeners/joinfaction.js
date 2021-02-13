@@ -19,6 +19,8 @@ module.exports = {
         var choice = parseInt(message.content);
         if (!groups[choice - 1])
             return message.channel.send(`Invalid group. Choose from numbers 1-${groups.length}`);
+        if (groups[choice - 1][1].requests.find(m => m === message.author.id))
+            return message.channel.send("You already sent a request to that group. Please wait");
         if (groups[choice - 1][1].members.length >= parseInt(process.env.MAX_MEMBERS))
             return message.channel.send(`That group already has ${process.env.MAX_MEMBERS}/${process.env.MAX_MEMBERS} members`);
         this.users[id].choice = choice;

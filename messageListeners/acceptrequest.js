@@ -42,12 +42,14 @@ module.exports = {
                 if (user.group !== "") {
                     delete this.users[id];
                     message.channel.send("**That user has already joined a group**");
+                    group.requests = group.requests.filter(id => id !== requester);
+                    DataManager.setGroup(user.group, group);
                     return;
                 }
                 user.group = this.users[id].data.name;
                 DataManager.setUser(requester, user);
                 group.members.push(requester);
-                group.requests.filter(id => id !== requester);
+                group.requests = group.requests.filter(id => id !== requester);
                 if (group.members.length >= 5) group.requests = [];
                 DataManager.setGroup(user.group, group);
                 message.channel.send(`**<@${requester}> Successfully Accepted!**`);
