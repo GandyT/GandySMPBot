@@ -34,9 +34,9 @@ module.exports = {
 
         await confirm.awaitReactions(
             (reaction, user) => (
-                reaction.emoji.name === "✅" || 
+                reaction.emoji.name === "✅" ||
                 reaction.emoji.name === "❌"
-                ) && user.id === id,
+            ) && user.id === id,
             { max: 1 }
         ).then(collected => {
             const reaction = collected.first();
@@ -45,7 +45,7 @@ module.exports = {
                 var user = DataManager.getUser(id);
                 user.group = this.users[id].name.toLowerCase();
                 DataManager.setUser(id, user);
-                DataManager.setGroup(this.users[id].name, { leader: id, members: [id], requests: [], allies: [], war: ""});
+                DataManager.setGroup(this.users[id].name, { leader: id, members: [id], requests: [], allies: [], allyrequests: [] });
                 message.channel.send("**Faction Successfully created! Good Luck!**");
             } else {
                 message.channel.send("**Setup Cancelled**");

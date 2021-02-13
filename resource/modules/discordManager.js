@@ -12,14 +12,14 @@ module.exports = {
             return bymember;
         var UserJSON = JSON.parse(Fs.readFileSync(`${__dirname}/../../data/users.json`));
         for ([key, value] of Object.entries(UserJSON)) {
-            if (value.username.toLowerCase() === message.content.toLowerCase())
+            if (value.username.toLowerCase() === data.toLowerCase())
                 return message.guild.members.cache.find(m => m.id === key);
         }
         if (!bymember)
             bymember = message.guild.members.cache.find(m => m.user.username.toLowerCase().startsWith(data) || (m.nickname && m.nickname.toLowerCase().startsWith(data)));
         if (bymember) return bymember;
         for ([key, value] of Object.entries(UserJSON)) {
-            if (value.username.toLowerCase().startsWith(message.content.toLowerCase()))
+            if (value.username.toLowerCase().startsWith(data.toLowerCase()))
                 return message.guild.members.cache.find(m => m.id === key);
         }
         return undefined;
