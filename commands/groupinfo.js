@@ -2,8 +2,8 @@ const Discord = require("discord.js");
 const DataManager = require("../resource/modules/dataManager.js");
 
 module.exports = {
-    names: ["groupinfo", "ginfo"],
-    desc: "get information on a certain group",
+    names: ["factioninfo", "fi"],
+    desc: "get information on a certain faction",
     async execute(env) {
         /** 
          * @param  {Discord.Message} message

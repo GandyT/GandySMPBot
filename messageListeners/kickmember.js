@@ -1,34 +1,41 @@
 /* EXETERNAL MODULES */
 const Discord = require("discord.js");
+const DiscordManager = require("../resource/modules/discordManager.js");
 const DataManager = require("../resource/modules/dataManager.js");
 
 module.exports = {
-    name: "createfaction",
+    name: "kickmember",
     users: {},
     async invoke(message) {
         const id = message.author.id;
         if (!this.users[id]) return false;
         if (this.users[id].channelId !== message.channel.id) return false;
-        if (this.users[id].name) {
+
+        if (this.users[id].hasUser) {
             delete this.users[id];
             message.channel.send("**Setup Cancelled**");
             return;
         }
 
-        if (DataManager.getGroup(message.content.toLowerCase())) {
-            message.channel.send("**Name already taken. Enter another name**");
-            return;
-        }
-        if (message.content.length > 40) {
-            message.channel.send("Max Name Length: 40. Try again");
-            return;
+        var user = DiscordManager.findUser(message.content.toLowerCase(), message);
+        if (user.id === message.author.id) {
+            delete this.users[id];
+            return message.channel.send("**You may not kick youreslf, setup cancelled**")
         }
 
-        this.users[id].name = message.content;
+        var smpUser = DataManager.getUser(user.id);
+        if (!smpUser) {
+            delete this.users[id];
+            return message.channel.send("**That user does not exist, setup cancelled**");
+        }
 
-        var confirm = await message.channel.send(
-            `**Are you sure you want to create ${this.users[id].name}?**`
-        );
+        var leader = DataManager.getUser(message.author.id);
+        if (smpUser.group !== leader.group) {
+            return message.channel.send("**That user is not in your group, setup cancelled**");
+        }
+        var group = DataManager.getGroup(leader.group);
+
+        const confirm = await message.channel.send(`**Kick ${smpUser.username} from ${smpUser.group}?**`);
         await confirm.react("✅");
         await confirm.react("❌");
 
@@ -42,11 +49,11 @@ module.exports = {
             const reaction = collected.first();
             if (!reaction) return;
             if (reaction.emoji.name === "✅") {
-                var user = DataManager.getUser(id);
-                user.group = this.users[id].name.toLowerCase();
-                DataManager.setUser(id, user);
-                DataManager.setGroup(this.users[id].name, { leader: id, members: [id], requests: [] });
-                message.channel.send("**Faction Successfully created! Good Luck!**");
+                smpUser.group = "";
+                DataManager.setUser(user.id, smpUser);
+                group.members = group.members.filter(m => m !== user.id);
+                DataManager.setGroup(leader.group, group);
+                message.channel.send(`**${smpUser.username} has been kicked from ${leader.group}.**`);
             } else {
                 message.channel.send("**Setup Cancelled**");
             }
@@ -60,9 +67,9 @@ module.exports = {
             this.users[userId] = {
                 id: userId,
                 data: data,
+                hasUser: false,
                 started: new Date().getTime(),
                 channelId: channelId,
-                name: ""
             }
     }
 }
