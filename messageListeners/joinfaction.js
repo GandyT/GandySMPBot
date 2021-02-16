@@ -17,12 +17,18 @@ module.exports = {
 
         var groups = Object.entries(DataManager.getGroups());
         var choice = parseInt(message.content);
-        if (!groups[choice - 1])
+        if (!groups[choice - 1]) {
+            delete this.users[id];
             return message.channel.send(`Invalid group. Choose from numbers 1-${groups.length}`);
-        if (groups[choice - 1][1].requests.find(m => m === message.author.id))
+        }
+        if (groups[choice - 1][1].requests.find(m => m === message.author.id)) {
+            delete this.users[id];
             return message.channel.send("You already sent a request to that group. Please wait");
-        if (groups[choice - 1][1].members.length >= parseInt(process.env.MAX_MEMBERS))
+        }
+        if (groups[choice - 1][1].members.length >= parseInt(process.env.MAX_MEMBERS)) {
+            delete this.users[id];
             return message.channel.send(`That group already has ${process.env.MAX_MEMBERS}/${process.env.MAX_MEMBERS} members`);
+        }
         this.users[id].choice = choice;
 
         const confirm = await message.channel.send(`Are you sure you want to join\n**${groups[choice - 1][0]}**?`);

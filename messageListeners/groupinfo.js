@@ -16,11 +16,15 @@ module.exports = {
             return message.channel.send(`Invalid group. Choose from numbers 1-${groups.length}`);
         }
         var group = groups[choice - 1];
+        var members = group[1].members.filter(m => m !== group[1].leader);
+        var memberStr = "";
+        members.forEach((mId, i) => {
+            memberStr += `${i + 1}) <@${mId}>\n`
+        });
         message.channel.send(
             new Discord.MessageEmbed()
                 .setTitle(`**${group[0]}**`)
-                .setDescription(`**Leader: <@${group[1].leader}>**`)
-                .addField(`**Member Count**`, `${group[1].members.length}/${process.env.MAX_MEMBERS}`)
+                .setDescription(`Count: ${group[1].members.length}/${process.env.MAX_MEMBERS}\n**Leader: <@${group[1].leader}>**\nMembers:\n${memberStr}`)
         )
         delete this.users[id];
 
